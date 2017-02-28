@@ -10,5 +10,14 @@ module.exports = {
     
     // return a view with data
     res.render('pages/events', {events: events});
+  },
+  
+  // show a single events
+  showSingle: (req, res) => {
+    // get a signle events
+    const event = {name: 'Basketball', slug: 'basketball', description: 'Throwing the ball in the basket'};
+    
+    // return a view with data
+    res.render('pages/single', {event: event});
   }
 }
