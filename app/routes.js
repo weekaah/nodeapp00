@@ -13,4 +13,9 @@ router.get('/', mainController.showHome);
 
 // events routes
 router.get('/events', eventsController.showEvents);
+
+// seed events
+router.get('/events/seed', eventsController.seedEvents);
+
+// single event
 router.get('/events/:slug', eventsController.showSingle);
