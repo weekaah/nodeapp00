@@ -5,7 +5,9 @@ module.exports = {
   showSingle: showSingle,
   seedEvents: seedEvents,
   showCreate: showCreate,
-  processCreate: processCreate
+  processCreate: processCreate,
+  showEdit: showEdit,
+  processEdit: processEdit
 }
   
 // show all events 
@@ -19,18 +21,21 @@ function showEvents(req, res) {
     }
     
     // return a view with data
-    res.render('pages/events', {events: events});
+    res.render('pages/events', {
+      events: events,
+      success: req.flash('success')
+    });
   });
 }
 
 // show a single event
 // ====================================
 function showSingle(req, res) {
-  // get a signle events
+  // get a signle event
   Event.findOne({slug: req.params.slug}, (err, event) => {
     if (err) {
       res.status(404);
-      res.send('Events not send');
+      res.send('Events not found');
     }
     
     // return a view with data
@@ -103,4 +108,57 @@ function processCreate(req, res) {
     // redirect to new event
     res.redirect(`/events/${event.slug}`);
   });
+}
+
+// show the edit form
+// ====================================
+function showEdit(req, res) {
+  // get a single event
+  Event.findOne({slug: req.params.slug}, (err, event) => {
+    if (err) {
+      res.status(404);
+      res.send('Event not found');
+    }
+    
+    // return a view with data
+    res.render('pages/edit', {
+      event: event,
+      errors: req.flash('errors')
+    });
+  });
+}
+
+// process the edit form
+// ====================================
+function processEdit(req, res) {
+  // validate info
+  req.checkBody('name', 'Name is required.').notEmpty();
+  req.checkBody('description', 'Description is required.').notEmpty();
+  
+  // if there are errors, redirect and save errors to flash
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('errors', errors.map(err => err.msg));
+    
+    return res.redirect(`/events/${req.params.slug}/edit`);
+  }
+  
+  // find a current event
+  Event.findOne({slug: req.params.slug}, (err, event) => {    
+    // update the event
+    event.name = req.body.name;
+    event.description = req.body.description;
+    
+    event.save((err) => {
+      if (err) throw err;
+        
+      // set a successful flash message
+      req.flash('success', 'Successfully updated event');
+        
+      // redirect to new event
+      res.redirect(`/events`);
+    });
+  })
+  
+
 }
