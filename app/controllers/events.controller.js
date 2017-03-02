@@ -3,7 +3,9 @@ const Event = require('../models/event');
 module.exports = {
   showEvents: showEvents,
   showSingle: showSingle,
-  seedEvents: seedEvents
+  seedEvents: seedEvents,
+  showCreate: showCreate,
+  processCreate: processCreate
 }
   
   
@@ -42,7 +44,7 @@ function seedEvents(req, res) {
     {name: 'Basketball', description: 'Throwing the ball in the basket'},
     {name: 'Swimming', description: 'Trying not to drown'},
     {name: 'Weightlifting', description: 'Lifteing heavy stuff'},
-    {name: 'Handball', description: 'Handball <stuff></stuff>'}
+    {name: 'Handball', description: 'Handball stuff'}
   ];
   
   // use the Event model to insert/save
@@ -55,4 +57,26 @@ function seedEvents(req, res) {
   
   // seeded!
   res.send('Database seeded');
+}
+
+// show the create form ===============
+function showCreate(req, res) {
+  res.render('pages/create');
+}
+
+// proces the create form =============
+function processCreate(req, res) {
+  // create a new event
+  const event = new Event({
+    name: req.body.name,
+    description: req.body.description
+  });
+  
+  // save event
+  event.save((err) => {
+    if (err) throw err;
+      
+    // redirect to new event
+    res.redirect(`/events/${event.slug}`);
+  });
 }
