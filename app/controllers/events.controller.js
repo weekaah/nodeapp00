@@ -10,18 +10,29 @@ module.exports = {
 // show all events ====================
 function showEvents(req, res) {
   // get all events
-  
-  // return a view with data
-  res.render('pages/events', {events: events});
+  Event.find({}, (err, events) => {
+    if (err) {
+      res.status(404);
+      res.send('Events not send');
+    }
+    
+    // return a view with data
+    res.render('pages/events', {events: events});
+  });
 }
 
 // show a single event ================
 function showSingle(req, res) {
   // get a signle events
-  const event = {name: 'Basketball', slug: 'basketball', description: 'Throwing the ball in the basket'};
-  
-  // return a view with data
-  res.render('pages/single', {event: event});
+  Event.findOne({slug: req.params.slug}, (err, event) => {
+    if (err) {
+      res.status(404);
+      res.send('Events not send');
+    }
+    
+    // return a view with data
+    res.render('pages/single', {event: event});
+  });
 }
 
 // seed our database ==================
@@ -41,7 +52,6 @@ function seedEvents(req, res) {
       newEvent.save();
     }
   });
-  
   
   // seeded!
   res.send('Database seeded');
